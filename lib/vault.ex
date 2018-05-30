@@ -1,0 +1,2 @@
+defmodule Vault do
+end
