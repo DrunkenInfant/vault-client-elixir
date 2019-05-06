@@ -4,7 +4,7 @@ defmodule Vault.MixProject do
   def project do
     [
       app: :vault_client,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -22,6 +22,7 @@ defmodule Vault.MixProject do
   defp deps do
     [
       {:httpoison, "~> 1.0"},
+      {:jose, "~> 1.8.0"},
       {:poison, "~> 3.1"},
       {:timex, "~> 3.1"},
     ]
