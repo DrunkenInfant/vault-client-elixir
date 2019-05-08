@@ -22,7 +22,6 @@ defmodule Vault.MixProject do
   defp deps do
     [
       {:httpoison, "~> 1.0"},
-      {:jose, "~> 1.8.0"},
       {:poison, "~> 3.1"},
       {:timex, "~> 3.1"},
     ]

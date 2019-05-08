@@ -72,20 +72,8 @@ defmodule Vault.Pki.CertificateIssuer do
   end
 
   defp send_certificates(dest, key, cert, chain) do
-    jwk = key
-      |> JOSE.JWK.from_pem()
-      |> JOSE.JWK.to_map()
-      |> (fn {_, jwk} -> jwk end).()
-      |> Map.merge(%{"x5c" => get_x5c(cert, chain), "alg" => "RS256"})
-
-    Process.send_after(dest, {:write, jwk}, 0)
-  end
-
-  defp get_x5c(cert, chain) do
-    "#{cert}#{chain}"
-      |> String.replace("\n", "")
-      |> (&Regex.scan(~r/-----BEGIN CERTIFICATE-----(.+?)-----END CERTIFICATE-----/, &1)).()
-      |> Enum.map(fn [_, b64] -> b64 end)
+    certs = Vault.Pki.CertificateSet.new(key, cert, chain)
+    Process.send_after(dest, {:write, certs}, 0)
   end
 
   defp parse_pem_string(pem_string) do
