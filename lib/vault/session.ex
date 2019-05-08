@@ -52,16 +52,18 @@ defmodule Vault.Session do
     case  Vault.Http.get(vault, "/auth/token/lookup-self") do
       {:ok, %{"data" => %{"renewable" => true, "expire_time" => expires_at_s}}} when is_bitstring(expires_at_s) ->
         {:ok, %{state|expires_at: Timex.parse!(expires_at_s, "{ISO:Extended}")}}
+      {:ok, %{"data" => %{"renewable" => false, "expire_time" => nil}}} ->
+        {:ok, %{state | expires_at: nil}}
       {:ok, %{"data" => %{"renewable" => false}}} ->
         {:fatal, {:token_not_renewable, "Token not renewable"}}
-      {:ok, _} ->
-        {:fatal, {:token_not_renewable, "Token does not expire"}}
       {:not_ok, err} ->
         {:fatal, err}
       {:error, err} ->
         {:error, err}
     end
   end
+
+  defp schedule_next(%{expires_at: nil} = state), do: {:ok, state}
 
   defp schedule_next(%{expires_at: expires_at, expire_margin: expire_margin} = state) do
     case Timex.diff(expires_at, Timex.now(), :seconds) do
